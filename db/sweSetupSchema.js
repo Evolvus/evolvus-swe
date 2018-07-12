@@ -22,7 +22,7 @@ var schema = new mongoose.Schema({
   },
   enabled: {
     type: String,
-    minlength: 5,
+    minlength: 4,
     maxlength: 10,
     default: "true"
   },
