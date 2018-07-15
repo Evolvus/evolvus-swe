@@ -19,6 +19,7 @@ const hbs = require("hbs");
 const helmet = require("helmet");
 const mongoose = require("mongoose");
 const _ = require("lodash");
+const shortid = require("shortid");
 
 const LIMIT = process.env.LIMIT || 10;
 const tenantHeader = "X-TENANT-ID";
@@ -139,6 +140,17 @@ app.use(function(req, res, next) {
   next();
 });
 
+app.use(function(err, req, res, next) {
+  let reference = shortid.generate();
+  debug("Reference %s, Unexpected exception in save %o", reference, JSON.stringify(err));
+  const response = {
+    "status": "500",
+    "description": "Unexpected error encountered. Server unable to process request. Please contact server administrator.",
+    "data": reference
+  };
+  res.status(500)
+    .json(response);
+});
 app.engine("html", hbsViewEngine);
 
 
@@ -172,7 +184,7 @@ const server = http.createServer(app);
 terminus(server, {
   signal: "SIGINT",
   healthChecks: {
-    "/healthcheck": onHealthCheck,
+    "/api/healthcheck": onHealthCheck,
   },
   onSignal
 });

@@ -1,8 +1,7 @@
 const debug = require("debug")("evolvus-swe:routes:api:setup");
 const _ = require("lodash");
 const schema = require("../../model/sweSetupSchema");
-const service = require("../../model/sweSetup");
-const attributes = _.keys(schema.properties);
+const service = require("../../index");
 const shortid = require("shortid");
 
 const LIMIT = process.env.LIMIT || 10;
@@ -10,20 +9,21 @@ const tenantHeader = "X-TENANT-ID";
 const userHeader = "X-USER";
 const PAGE_SIZE = 10;
 
+const attributes = "wfEntity, wfEntityAction, query";
+
 module.exports = (router) => {
-  router.route('/setup')
+  // post with the following in the body
+  // wfEntity, wfEntityAction, query
+  router.route('/initialize')
     .post((req, res, next) => {
       const response = {
         "status": "200",
         "description": "",
         "data": {}
       };
-      let tenantId = req.body.tenantId;
       let body = _.pick(req.body, attributes);
-      body.createdDate = Date.now();
-      body.updatedDate = Date.now();
       debug("saving object" + JSON.stringify(body, null, 2));
-      service.save(tenantId, body)
+      service.initialize(tenantId, body.createdBy, body.wfEntity, body.wfEntityAction, body.query)
         .then((result) => {
           response.description = "Record saved successfully";
           response.data = result;

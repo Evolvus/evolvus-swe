@@ -1,7 +1,11 @@
 const debug = require("debug")("evolvus-swe:model:sweSetup");
 const model = require("./sweEventSchema")
   .schema;
-const collection = require("../db/sweSetup");
+
+const schema = require("../db/sweSetupSchema");
+const Dao = require("../db/dao");
+const collection = new Dao("sweSetup", schema);
+
 const _ = require("lodash");
 
 const validate = require("jsonschema")
@@ -22,4 +26,12 @@ module.exports.find = (tenantId, filter, orderby, skipCount, limit) => {
     "tenantId": tenantId
   });
   return collection.find(query, orderby, skipCount, limit);
+};
+
+
+module.exports.findOne = (tenantId, filter) => {
+  let query = _.merge(filter, {
+    "tenantId": tenantId
+  });
+  return collection.findOne(query);
 };
