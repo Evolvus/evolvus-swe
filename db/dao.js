@@ -1,8 +1,19 @@
 const debug = require("debug")("evolvus-swe:db:dao");
 const mongoose = require("mongoose");
 
-
+// Generic Mongo data access class.
+// All db related activity abstracted to this class
+// Instantiate a model and use the methods on it.
+// We can safely add more methods (like aggregate etc)
+// without impacting the calling code and making it available
+// for all collections
 module.exports = function(model, schema) {
+
+  // The schema defined for the model
+  this.schema = schema;
+  // The name of the colleciton created inside Mongo (without the 's')
+  this.collectionName = model;
+  // define the mongo collection/model
   this.objectModel = mongoose.model(model, schema);
 
   // Saves the sweSetup object to the database and returns a Promise

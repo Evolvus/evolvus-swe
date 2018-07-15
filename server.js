@@ -4,7 +4,6 @@
  ** defaults to 3000
  */
 const PORT = process.env.PORT || 3000;
-const DBURL = process.env.MONGO_DB_URL || "mongodb://localhost:27017/Docket";
 
 /*
  ** Get all the required libraries
@@ -17,7 +16,7 @@ const bodyParser = require("body-parser");
 const path = require("path");
 const hbs = require("hbs");
 const helmet = require("helmet");
-const mongoose = require("mongoose");
+const db = require("./db");
 const _ = require("lodash");
 const shortid = require("shortid");
 
@@ -27,43 +26,7 @@ const userHeader = "X-USER";
 const ipHeader = "X-IP-HEADER";
 const PAGE_SIZE = 10;
 
-const options = {
-  autoIndex: false, // Don"t build indexes
-  autoReconnect: true,
-  //reconnectTries: Number.MAX_VALUE, // Never stop trying to reconnect
-  reconnectInterval: 5000, // Reconnect every 500ms
-
-  // Maintain up to 10 socket connections,
-  // should ideally come from environment variables
-  poolSize: 10,
-  // If not connected, return errors immediately rather than waiting for reconnect
-  bufferMaxEntries: 0,
-
-  // if this is low, you will keep disconnecting
-  connectTimeoutMS: 5000,
-  socketTimeoutMS: 5000,
-  keepAlive: true,
-
-  // try so many times...here keeping it low, should be higher in production
-  reconnectTries: 5,
-  useNewUrlParser: true,
-  appname: "Simple Workflow Engine"
-};
-
-mongoose.connect(DBURL, options);
-let connection = mongoose.connection;
-connection.on("error", (e) => {
-  debug("Error getting connection:" + JSON.stringify(e));
-});
-connection.on("open", () => {
-  debug("Got connection");
-});
-connection.on("connected", () => {
-  debug("Connection connected");
-});
-connection.on("disconnected", () => {
-  debug("Connection got disconnected");
-});
+var connection = db.connect("swe");
 
 const hbsViewEngine = hbs.__express;
 const app = express();
@@ -163,7 +126,7 @@ app.use("/api/", router);
 function onSignal() {
   console.log("server is starting cleanup");
   // start cleanup of resource, like databases or file descriptors
-  connection.close();
+  db.disconnect();
 }
 
 function onHealthCheck() {
