@@ -57,7 +57,8 @@ var schema = new mongoose.Schema({
 
 schema.index({
   tenantId: 1,
-  wfInstanceId: 2
+  wfEntity: 2,
+  wfEntityAction: 3
 }, {
   unique: true
 });

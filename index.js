@@ -17,39 +17,62 @@ const shortid = require("shortid");
 // if the flowCode is 'AA' - we call complete with Status = 'APPROVED', wfInstanceId
 // (newly created), and comment - Automatic Approval.
 module.exports.initialize = (tenantId, createdBy, wfEntity, wfEntityAction, query) => {
-  return new Promise((resolve, reject) => {
-    var filter = {
-      "wfEntity": wfEntity,
-      "wfEntityAction": wfEntityAction
-    };
-    setupService.findOne(tenantId, filter)
-      .then((result) => {
-        // find returns an array of size 0 on no data found
-        // findOne returns null, _.isEmpty returns true of null or size 0
-        if (_.isEmpty(result)) { // no records found
-          return Promise.reject({
-            "wfStatus": "NO_WORKFLOW_DEFINED",
-            "wfInstanceId": "0"
-          });
-        } else { //we found a configuration record
-          let wfInstanceId = shortid.generate();
-          return eventService.save(tenantId, {
-            "wfInstanceId": wfInstanceId,
-            "wfStatus": "INITIALIZED",
-            "wfEntity": wfEntity,
-            "wfEntityAction": wfEntityAction,
-            "eventDate": Date.now(),
-            "eventStatus": "IN_PROGRESS",
-            "createdBy": createdBy
-          });
-        } // if else ends
-      })
-      .then((resolved, rejected) => {
-
-      });
-  });
+  let wfInstanceId = shortid.generate();
+  let sweEvent = {
+    "wfInstanceId": wfInstanceId,
+    "wfInstanceStatus": "IN_PROGRESS",
+    "wfEntity": wfEntity,
+    "wfEntityAction": wfEntityAction,
+    "query": JSON.stringify(query),
+    "wfEventDate": Date.now(),
+    "wfEvent": "PENDING_AUTHORIZATION",
+    "createdBy": createdBy,
+    "createdDate": Date.now()
+  };
+  return eventService.save(tenantId, sweEvent)
+    .then((result) => {
+      var query = {
+        "wfEntity": wfEntity,
+        "wfEntityAction": wfEntityAction
+      };
+      return setupService.findOne(tenantId, query);
+    })
+    .then((result) => {
+      if (result == null) { // no records found..
+        return module.exports.complete(tenantId, createdBy, wfEntity, wfEntityAction, query, wfInstanceId, "REPROCESS", "Invalid WF Configuration")
+      } else {
+        if (result.flowCode == 'AA') { // automatic approval
+          return module.exports.complete(tenantId, createdBy, wfEntity, wfEntityAction, query, wfInstanceId, "AUTHORIZED", "Automatic Approval")
+        } else { // maker checker
+          return Promise.resolve(sweEvent);
+        }
+      }
+    });
 };
 
-module.exports.complete = () => {
+module.exports.complete = (tenantId, createdBy, wfEntity, wfEntityAction, query, wfInstanceId, wfEvent, comments) => {
+  let sweEvent = {
+    "wfInstanceId": wfInstanceId,
+    "wfInstanceStatus": "COMPLETED",
+    "wfEntity": wfEntity,
+    "wfEntityAction": wfEntityAction,
+    "query": JSON.stringify(query),
+    "wfEventDate": Date.now(),
+    "wfEvent": wfEvent,
+    "createdBy": createdBy,
+    "createdDate": Date.now(),
+    "comments": comments
+  };
+  debug("saving event %O", sweEvent);
 
+  return eventService.update(tenantId, {
+      "wfInstanceId": wfInstanceId
+    }, {
+      "wfInstanceStatus": "COMPLETED",
+      "updatedBy": createdBy,
+      "updatedDate": Date.now()
+    })
+    .then((result) => {
+      return eventService.save(tenantId, sweEvent);
+    });
 };

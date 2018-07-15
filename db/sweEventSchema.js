@@ -22,7 +22,7 @@ var schema = new mongoose.Schema({
   },
   wfEntity: {
     type: String,
-    minlength: 5,
+    minlength: 3,
     maxlength: 10,
     default: "true"
   },
@@ -31,12 +31,23 @@ var schema = new mongoose.Schema({
     minlength: 1,
     maxlength: 255
   },
-  eventDate: {
+  query: {
+    type: String,
+    required: true,
+    minLength: 1,
+    maxLength: 255
+  },
+  wfEventDate: {
     type: Date,
     default: Date.now()
   },
-  eventStatus: {
+  wfEvent: {
     type: String
+  },
+  comments: {
+    type: String,
+    minLength: 1,
+    maxLength: 255
   },
   createdBy: {
     type: String,
@@ -57,7 +68,8 @@ var schema = new mongoose.Schema({
 schema.index({
   tenantId: 1,
   wfEntity: 2,
-  wfEntityAction: 3
+  wfEntityAction: 3,
+  wfInstanceId: 4
 }, {
   unique: true
 });

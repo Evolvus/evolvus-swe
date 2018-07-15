@@ -1,29 +1,29 @@
-const debug = require("debug")("evolvus-swe:routes:api:setup");
+const debug = require("debug")("evolvus-swe:routes:api:swe");
 const _ = require("lodash");
-const schema = require("../../model/sweSetupSchema");
+
 const service = require("../../index");
 const shortid = require("shortid");
 
-const LIMIT = process.env.LIMIT || 10;
-const tenantHeader = "X-TENANT-ID";
-const userHeader = "X-USER";
-const PAGE_SIZE = 10;
+const initializeAttributes = ["wfEntity", "wfEntityAction", "query"];
+const completionAttributes = ["wfEntity", "wfEntityAction", "query", "wfInstanceId", "wfEvent", "comments"];
 
-const attributes = "wfEntity, wfEntityAction, query";
 
 module.exports = (router) => {
   // post with the following in the body
   // wfEntity, wfEntityAction, query
-  router.route('/initialize')
+  router.route('/swe/initialize')
     .post((req, res, next) => {
       const response = {
         "status": "200",
         "description": "",
         "data": {}
       };
-      let body = _.pick(req.body, attributes);
+
+      let tenantId = req.body.tenantId;
+      let createdBy = req.body.createdBy;
+      let body = _.pick(req.body, initializeAttributes);
       debug("saving object" + JSON.stringify(body, null, 2));
-      service.initialize(tenantId, body.createdBy, body.wfEntity, body.wfEntityAction, body.query)
+      service.initialize(tenantId, createdBy, body.wfEntity, body.wfEntityAction, body.query)
         .then((result) => {
           response.description = "Record saved successfully";
           response.data = result;
@@ -42,6 +42,39 @@ module.exports = (router) => {
             .send(JSON.stringify(response, null, 2));
         });
     });
+
+  router.route('/swe/complete')
+    .post((req, res, next) => {
+      const response = {
+        "status": "200",
+        "description": "",
+        "data": {}
+      };
+
+      let tenantId = req.body.tenantId;
+      let createdBy = req.body.createdBy;
+      let body = _.pick(req.body, completionAttributes);
+      debug("updating object" + JSON.stringify(body, null, 2));
+      service.complete(tenantId, createdBy, body.wfEntity, body.wfEntityAction, body.query, body.wfInstanceId, body.wfEvent, body.comments)
+        .then((result) => {
+          response.description = "Record saved successfully";
+          response.data = result;
+          res.status(200)
+            .send(JSON.stringify(response, null, 2));
+        })
+        .catch((e) => {
+          // With the reference we should be able to search the logs and find out
+          // what exactly was the error.
+          let reference = shortid.generate();
+          response.status = "400";
+          response.data = reference;
+          response.description = "Unable to save workflow engine configuration. Contact administrator";
+          debug("Reference %s, Unexpected exception in save %o", reference, JSON.stringify(e));
+          res.status(400)
+            .send(JSON.stringify(response, null, 2));
+        });
+    });
+
 
   router.route('/setup')
     .get((req, res, next) => {
