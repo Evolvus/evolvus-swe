@@ -1,6 +1,5 @@
-# evolvus-docket-server
-Evolvus Docket Server is an audit server. It can be plugged into any application.
-It store audit events into a MongoDB store.
+# evolvus-swe
+Evolvus Simple Workflow engine
 
 ### Prerequisites
 1) MongoDB
