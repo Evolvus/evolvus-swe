@@ -33,6 +33,11 @@ const schema = {
       "minLength": 3,
       "maxLength": 20
     },
+    "query": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255
+    },
     "eventDate": {
       "type": Date
     },
@@ -51,7 +56,7 @@ const schema = {
     "updatedDate": {
       "type": Date
     },
-    "required": ["tenantId", "wfInstanceId", "wfEntity", "wfEntityAction", "eventStatus", "createdBy", "createdDate", "wfInstanceStatus"]
+    "required": ["tenantId", "wfInstanceId", "wfEntity", "wfEntityAction", "query", "eventStatus", "createdBy", "createdDate", "wfInstanceStatus"]
   }
 };
 

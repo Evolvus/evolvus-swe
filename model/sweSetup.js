@@ -16,12 +16,12 @@ module.exports.save = (tenantId, object) => {
   let result = _.merge(object, {
     "tenantId": tenantId
   });
-
   return collection.save(result)
 };
 
 // Ensure skipCount is >= 0
 module.exports.find = (tenantId, filter, orderby, skipCount, limit) => {
+
   let query = _.merge(filter, {
     "tenantId": tenantId
   });

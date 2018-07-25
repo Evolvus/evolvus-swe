@@ -114,11 +114,21 @@ app.use(function(err, req, res, next) {
   res.status(500)
     .json(response);
 });
+
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Request-Headers", "*");
+  res.header('Access-Control-Allow-Methods', 'GET,POST,PUT, DELETE, OPTIONS');
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With,X-HTTP-Method-Override, Content-Type, Accept, Authorization,entityId,tenantId,entityCode,accessLevel");
+  res.header("Access-Control-Allow-Credentials", "true");
+  next();
+});
+
 app.engine("html", hbsViewEngine);
 
 
 require("./routes/main")(router);
-app.use("/api/", router);
+app.use("/api", router);
 
 /*
  * Healthcheck and gracefull shutdown..

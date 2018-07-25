@@ -68,7 +68,7 @@ module.exports = (router) => {
           let reference = shortid.generate();
           response.status = "400";
           response.data = reference;
-          response.description = "Unable to save workflow engine configuration. Contact administrator";
+          response.description = "Unable to save workflow engine (complete) configuration. Contact administrator";
           debug("Reference %s, Unexpected exception in save %o", reference, JSON.stringify(e));
           res.status(400)
             .send(JSON.stringify(response, null, 2));
