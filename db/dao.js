@@ -39,7 +39,6 @@ module.exports = function(model, schema) {
 
   // findOne returns an object or null based on the filter condition
   this.findOne = function(filter) {
-
     return this.objectModel.findOne(filter);
   };
 

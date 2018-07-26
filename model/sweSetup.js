@@ -21,7 +21,6 @@ module.exports.save = (tenantId, object) => {
 
 // Ensure skipCount is >= 0
 module.exports.find = (tenantId, filter, orderby, skipCount, limit) => {
-
   let query = _.merge(filter, {
     "tenantId": tenantId
   });

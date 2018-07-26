@@ -24,7 +24,7 @@ module.exports.initialize = (tenantId, createdBy, wfEntity, wfEntityAction, obje
     "wfInstanceStatus": "IN_PROGRESS",
     "wfEntity": wfEntity,
     "wfEntityAction": wfEntityAction,
-    "query": objectId,
+    "query": JSON.stringify(objectId),
     "wfEventDate": Date.now(),
     "wfEvent": "PENDING_AUTHORIZATION",
     "createdBy": createdBy,
@@ -41,10 +41,10 @@ module.exports.initialize = (tenantId, createdBy, wfEntity, wfEntityAction, obje
     })
     .then((result) => {
       if (result == null) { // no records found..
-        return module.exports.complete(tenantId, createdBy, wfEntity, wfEntityAction, query, wfInstanceId, "REPROCESS", "Invalid WF Configuration")
+        return module.exports.complete(tenantId, createdBy, wfEntity, wfEntityAction, objectId, wfInstanceId, "REPROCESS", "Invalid WF Configuration")
       } else {
         if (result.flowCode == 'AA') { // automatic approval
-          return module.exports.complete(tenantId, createdBy, wfEntity, wfEntityAction, query, wfInstanceId, "AUTHORIZED", "Automatic Approval")
+          return module.exports.complete(tenantId, createdBy, wfEntity, wfEntityAction, objectId, wfInstanceId, "AUTHORIZED", "Automatic Approval")
         } else { // maker checker
           return Promise.resolve(sweEvent);
         }
@@ -79,7 +79,6 @@ module.exports.complete = (tenantId, createdBy, wfEntity, wfEntityAction, object
         "X-ACCESS-LEVEL": "1",
         "X-ENTITY-ID": "H001B001"
       },
-
       method: result.callbackMethod,
       url: result.callbackURL + "/" + objectId,
       data: {

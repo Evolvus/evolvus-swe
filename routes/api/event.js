@@ -1,14 +1,16 @@
 const debug = require("debug")("evolvus-swe:routes:api:event");
 const _ = require("lodash");
 const schema = require("../../model/sweEventSchema");
-const service = require("../../model/sweEvent");
+const event = require("../../model/sweEvent");
 const attributes = _.keys(schema.properties);
 const shortid = require("shortid");
 
-const LIMIT = process.env.LIMIT || 10;
+const LIMIT = process.env.LIMIT || 20;
 const tenantHeader = "X-TENANT-ID";
 const userHeader = "X-USER";
 const PAGE_SIZE = 10;
+
+var filterAttributes = require("../../model/sweEventSchema").filterAttributes;
 
 module.exports = (router) => {
   router.route('/event')
@@ -25,7 +27,7 @@ module.exports = (router) => {
       body.createdDate = Date.now();
       body.updatedDate = Date.now();
       debug("saving object" + JSON.stringify(body, null, 2));
-      service.save(tenantId, body)
+      event.save(tenantId, body)
         .then((result) => {
           response.description = "Record saved successfully";
           response.data = result;
@@ -44,4 +46,71 @@ module.exports = (router) => {
             .send(JSON.stringify(response, null, 2));
         });
     });
+
+  router.route('/event')
+    .get((req, res, next) => {
+      const tenantId = req.header(tenantHeader);
+      const createdBy = req.header(userHeader);
+      const ipAddress = req.ip;
+      const response = {
+        "status": "200",
+        "description": "",
+        "data": {}
+      };
+      debug("query: " + JSON.stringify(req.query));
+      var limit = _.get(req.query, "limit", LIMIT);
+      var pageSize = _.get(req.query, "pageSize", PAGE_SIZE);
+      var pageNo = _.get(req.query, "pageNo", 1);
+      var skipCount = (pageNo - 1) * pageSize;
+      // var filterValues = _.pick(req.query, filterAttributes);
+      // var filter = _.omitBy(filterValues, function(value, key) {
+      //   return value.startsWith("undefined");
+      // });
+      var filter = _.pick(req.query, filterAttributes);
+      var sort = _.get(req.query, "sort", {});
+      var orderby = sortable(sort);
+
+      event.find(tenantId, filter, orderby, skipCount, limit)
+        .then((result) => {
+          response.description = (result.length == 0 ? "No matching records found" : "Found matching records");
+          response.totalNoOfPages = Math.ceil(result.length / pageSize);
+          response.totalNoOfRecords = result.length;
+          response.data = result;
+          res.status(200)
+            .send(JSON.stringify(response, null, 2));
+        })
+        .catch((e) => {
+          response.status = "400";
+          response.data = null;
+          response.description = e;
+          response.totalNoOfRecords = 0;
+          response.totalNoOfPages = 0;
+          res.status(400)
+            .send(JSON.stringify(response, null, 2));
+        });
+    });
 };
+
+function sortable(sort) {
+  if (typeof sort === 'undefined' ||
+    sort == null) {
+    return {};
+  }
+  if (typeof sort === 'string') {
+    var result = sort.split(",")
+      .reduce((temp, sortParam) => {
+        if (sortParam.charAt(0) == "-") {
+          return _.assign(temp, _.fromPairs([
+            [sortParam.replace(/-/, ""), -1]
+          ]));
+        } else {
+          return _.assign(_.fromPairs([
+            [sortParam.replace(/\+/, ""), 1]
+          ]));
+        }
+      }, {});
+    return result;
+  } else {
+    return {};
+  }
+}

@@ -1,6 +1,9 @@
 /*
  ** JSON Schema representation of the application model
  */
+
+const _ = require("lodash");
+
 const schema = {
   "$schema": "http://json-schema.org/draft-06/schema#",
   "title": "sweEventModel",
@@ -20,6 +23,7 @@ const schema = {
     },
     "wfInstanceStatus": {
       "type": "string",
+      "filterable": true,
       "minLength": 3,
       "maxLength": 20
     },
@@ -61,3 +65,9 @@ const schema = {
 };
 
 module.exports = schema;
+
+filterAttributes = _.keys(_.pickBy(schema.properties, (a) => {
+  return (a.filterable);
+}));
+
+module.exports.filterAttributes = filterAttributes;

@@ -32,7 +32,7 @@ module.exports = (router) => {
         })
         .catch((e) => {
           // With the reference we should be able to search the logs and find out
-          // what exactly was the error.
+          // what exactly was the error
           let reference = shortid.generate();
           response.status = "400";
           response.data = reference;
