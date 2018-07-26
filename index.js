@@ -24,7 +24,7 @@ module.exports.initialize = (tenantId, createdBy, wfEntity, wfEntityAction, obje
     "wfInstanceStatus": "IN_PROGRESS",
     "wfEntity": wfEntity,
     "wfEntityAction": wfEntityAction,
-    "query": JSON.stringify(objectId),
+    "query": objectId,
     "wfEventDate": Date.now(),
     "wfEvent": "PENDING_AUTHORIZATION",
     "createdBy": createdBy,
@@ -66,47 +66,29 @@ module.exports.complete = (tenantId, createdBy, wfEntity, wfEntityAction, object
     "comments": comments
   };
   debug("saving event %O", sweEvent);
-  console.log("before query");
   var query = {
     "wfEntity": wfEntity,
     "wfEntityAction": wfEntityAction
   };
-  console.log("query", query);
-  console.log("before complete findone");
   setupService.findOne(tenantId, query).then((result) => {
-    console.log("result", result);
     axios({
       headers: {
-        tenantId: "T001",
-        createdBy: "user",
-        ipAddress: "192.168.1.122",
-        accessLevel: "2",
-        entityId: "H001B001GW9wL"
+        "X-TENANT-ID": tenantId,
+        "X-USER": createdBy,
+        "X-IP-HEADER": "192.168.1.122",
+        "X-ACCESS-LEVEL": "1",
+        "X-ENTITY-ID": "H001B001"
       },
+
       method: result.callbackMethod,
-      url: result.callbackURL,
-      params: {
-        entityCode: "ENTITY3"
-      },
-
+      url: result.callbackURL + "/" + objectId,
       data: {
-
-        wfInstanceStatus: "COMPLETED"
-
+        "wfInstanceStatus": "COMPLETED"
       }
-    }).catch((err) => {
-      console.log("error axiox", err);
-    });
-    // axios.put(result.callbackURL, {
-    //     wfInstanceStatus: "COMPLETED"
-    //   })
-    //   .then(response => {
-    //     console.log(response);
-    //   })
-    //   .catch(error => {
-    //     console.log(error);
-    //   });
 
+    }).catch((err) => {
+      debug(`Error:${err} and failed to Axios`)
+    });
   }).catch((err) => {
     debug(`Error:${err} and failed to findOne setup`);
     resolve(err);

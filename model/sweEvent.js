@@ -18,6 +18,7 @@ module.exports.save = (tenantId, object) => {
 };
 
 module.exports.find = (tenantId, filter, orderby, skipCount, limit) => {
+  console.log("filetr in find event", filter);
   return collection.find(tenantId, filter, orderby, skipCount, limit);
 };
 
