@@ -40,6 +40,7 @@ module.exports.initialize = (tenantId, createdBy, wfEntity, wfEntityAction, obje
       return setupService.findOne(tenantId, query);
     })
     .then((result) => {
+      console.log("findone result", result);
       if (result == null) { // no records found..
         return module.exports.complete(tenantId, createdBy, wfEntity, wfEntityAction, objectId, wfInstanceId, "REPROCESS", "Invalid WF Configuration")
       } else {
@@ -52,7 +53,7 @@ module.exports.initialize = (tenantId, createdBy, wfEntity, wfEntityAction, obje
     });
 };
 
-module.exports.complete = (tenantId, createdBy, wfEntity, wfEntityAction, objectId, wfInstanceId, wfEvent, comments) => {
+module.exports.complete = (tenantId, createdBy, wfEntity, wfInstanceId, wfEvent, comments) => {
   let sweEvent = {
     "wfInstanceId": wfInstanceId,
     "wfInstanceStatus": "COMPLETED",
@@ -80,9 +81,9 @@ module.exports.complete = (tenantId, createdBy, wfEntity, wfEntityAction, object
         "X-ENTITY-ID": "H001B001"
       },
       method: result.callbackMethod,
-      url: result.callbackURL + "/" + objectId,
+      url: result.callbackURL + "/" + objectId + "/swe",
       data: {
-        "wfInstanceStatus": "COMPLETED"
+        "processingStatus": wfEvent
       }
 
     }).catch((err) => {

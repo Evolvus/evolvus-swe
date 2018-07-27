@@ -19,13 +19,14 @@ const schema = {
     "wfInstanceId": {
       "type": "string",
       "minLength": 3,
+      "filterable": true,
       "maxLength": 20
     },
     "wfInstanceStatus": {
       "type": "string",
       "filterable": true,
       "minLength": 3,
-      "maxLength": 20
+      "maxLength": 30
     },
     "wfEntity": {
       "type": "string",
