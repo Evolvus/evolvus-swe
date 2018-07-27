@@ -25,7 +25,7 @@ const schema = {
       "type": "string",
       "filterable": true,
       "minLength": 3,
-      "maxLength": 20
+      "maxLength": 30
     },
     "wfEntity": {
       "type": "string",

@@ -18,12 +18,12 @@ var schema = new mongoose.Schema({
     type: String,
     required: true,
     minlength: 3,
-    maxlength: 20
+    maxlength: 30
   },
   wfEntity: {
     type: String,
     minlength: 3,
-    maxlength: 10,
+    maxlength: 20,
     default: "true"
   },
   wfEntityAction: {
