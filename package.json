@@ -1,6 +1,6 @@
 {
   "name": "evolvus-swe",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Simple Workflow Engine for Evolvus Components",
   "main": "server.js",
   "scripts": {

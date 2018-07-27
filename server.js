@@ -77,7 +77,6 @@ app.use(bodyParser.json({
 app.use(function(req, res, next) {
 
   // Website you wish to allow to connect
-  res.setHeader("Access-Control-Allow-Origin", "*");
 
   // Request methods you wish to allow
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT");
@@ -116,7 +115,7 @@ app.use(function(err, req, res, next) {
 });
 
 app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
+  //  res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Request-Headers", "*");
   res.header('Access-Control-Allow-Methods', 'GET,POST,PUT, DELETE, OPTIONS');
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With,X-HTTP-Method-Override, Content-Type, Accept, Authorization,entityId,tenantId,entityCode,accessLevel");

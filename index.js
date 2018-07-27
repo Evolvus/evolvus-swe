@@ -21,7 +21,7 @@ module.exports.initialize = (tenantId, createdBy, wfEntity, wfEntityAction, obje
   let wfInstanceId = shortid.generate();
   let sweEvent = {
     "wfInstanceId": wfInstanceId,
-    "wfInstanceStatus": "IN_PROGRESS",
+    "wfInstanceStatus": "PENDING_AUTHORIZATION",
     "wfEntity": wfEntity,
     "wfEntityAction": wfEntityAction,
     "query": JSON.stringify(objectId),
