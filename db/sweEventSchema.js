@@ -23,7 +23,7 @@ var schema = new mongoose.Schema({
   wfEntity: {
     type: String,
     minlength: 3,
-    maxlength: 10,
+    maxlength: 20,
     default: "true"
   },
   wfEntityAction: {
