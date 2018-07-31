@@ -67,6 +67,8 @@ module.exports = (router) => {
       //   return value.startsWith("undefined");
       // });
       var filter = _.pick(req.query, filterAttributes);
+      console.log("filter",filter);
+      
       var sort = _.get(req.query, "sort", {});
       var orderby = sortable(sort);
 

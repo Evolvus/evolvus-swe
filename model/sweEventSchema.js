@@ -40,6 +40,7 @@ const schema = {
     },
     "query": {
       "type": "string",
+      "filterable": true,
       "minLength": 1,
       "maxLength": 255
     },
