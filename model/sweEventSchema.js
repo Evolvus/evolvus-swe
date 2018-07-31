@@ -43,6 +43,11 @@ const schema = {
       "minLength": 1,
       "maxLength": 255
     },
+    "comments": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 255
+    },
     "eventDate": {
       "type": Date
     },

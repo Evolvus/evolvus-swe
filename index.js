@@ -53,25 +53,27 @@ module.exports.initialize = (tenantId, createdBy, wfEntity, wfEntityAction, obje
     });
 };
 
-module.exports.complete = (tenantId, createdBy, wfEntity, wfInstanceId, wfEvent, comments) => {
+module.exports.complete = (tenantId, createdBy, wfEntity, objectId, wfInstanceId, wfEvent, comments) => {
   let sweEvent = {
     "wfInstanceId": wfInstanceId,
     "wfInstanceStatus": "COMPLETED",
-    "wfEntity": wfEntity,
-    "wfEntityAction": wfEntityAction,
+    //"wfEntityAction": wfEntityAction,
     "query": JSON.stringify(objectId),
+    "wfEntity": wfEntity,
     "wfEventDate": Date.now(),
     "wfEvent": wfEvent,
     "createdBy": createdBy,
+    // "updatedBy": createdBy,
     "createdDate": Date.now(),
     "comments": comments
   };
   debug("saving event %O", sweEvent);
   var query = {
     "wfEntity": wfEntity,
-    "wfEntityAction": wfEntityAction
+    //"wfEntityAction": wfEntityAction
   };
   setupService.findOne(tenantId, query).then((result) => {
+    console.log("conmpletet findone", result);
     axios({
       headers: {
         "X-TENANT-ID": tenantId,
@@ -81,7 +83,7 @@ module.exports.complete = (tenantId, createdBy, wfEntity, wfInstanceId, wfEvent,
         "X-ENTITY-ID": "H001B001"
       },
       method: result.callbackMethod,
-      url: result.callbackURL + "/" + objectId + "/swe",
+      url: result.callbackURL + "/" + objectId,
       data: {
         "processingStatus": wfEvent
       }
