@@ -40,7 +40,6 @@ module.exports.initialize = (tenantId, createdBy, wfEntity, wfEntityAction, obje
       return setupService.findOne(tenantId, query);
     })
     .then((result) => {
-      console.log("findone result", result);
       if (result == null) { // no records found..
         return module.exports.complete(tenantId, createdBy, wfEntity, wfEntityAction, objectId, wfInstanceId, "REPROCESS", "Invalid WF Configuration")
       } else {
@@ -73,7 +72,6 @@ module.exports.complete = (tenantId, createdBy, wfEntity, objectId, wfInstanceId
     //"wfEntityAction": wfEntityAction
   };
   setupService.findOne(tenantId, query).then((result) => {
-    console.log("conmpletet findone", result);
     axios({
       headers: {
         "X-TENANT-ID": tenantId,
