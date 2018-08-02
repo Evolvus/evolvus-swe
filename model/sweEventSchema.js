@@ -65,7 +65,9 @@ const schema = {
       "type": Date
     },
     "updatedDate": {
-      "type": Date
+      "type": Date,
+      "filterable": "false",
+      "sortable": "true"
     },
     "required": ["tenantId", "wfInstanceId", "wfEntity", "wfEntityAction", "query", "eventStatus", "createdBy", "createdDate", "wfInstanceStatus"]
   }
@@ -78,3 +80,9 @@ filterAttributes = _.keys(_.pickBy(schema.properties, (a) => {
 }));
 
 module.exports.filterAttributes = filterAttributes;
+
+sortableAttributes = _.keys(_.pickBy(schema.properties, (a) => {
+  return (a.sortable);
+}));
+
+module.exports.sortableAttributes = sortableAttributes;

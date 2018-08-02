@@ -5,12 +5,17 @@ const event = require("../../model/sweEvent");
 const attributes = _.keys(schema.properties);
 const shortid = require("shortid");
 
+const ORDER_BY = process.env.ORDER_BY || {
+  updatedDate: -1
+};
+
 const LIMIT = process.env.LIMIT || 20;
 const tenantHeader = "X-TENANT-ID";
 const userHeader = "X-USER";
 const PAGE_SIZE = 10;
 
 var filterAttributes = require("../../model/sweEventSchema").filterAttributes;
+var sortableAttributes = require("../../model/sweEventSchema").sortableAttributes;
 
 module.exports = (router) => {
   router.route('/event')
@@ -62,13 +67,8 @@ module.exports = (router) => {
       var pageSize = _.get(req.query, "pageSize", PAGE_SIZE);
       var pageNo = _.get(req.query, "pageNo", 1);
       var skipCount = (pageNo - 1) * pageSize;
-      // var filterValues = _.pick(req.query, filterAttributes);
-      // var filter = _.omitBy(filterValues, function(value, key) {
-      //   return value.startsWith("undefined");
-      // });
       var filter = _.pick(req.query, filterAttributes);
-      console.log("filter",filter);
-      
+
       var sort = _.get(req.query, "sort", {});
       var orderby = sortable(sort);
 
@@ -96,7 +96,7 @@ module.exports = (router) => {
 function sortable(sort) {
   if (typeof sort === 'undefined' ||
     sort == null) {
-    return {};
+    return ORDER_BY;
   }
   if (typeof sort === 'string') {
     var result = sort.split(",")
@@ -113,6 +113,6 @@ function sortable(sort) {
       }, {});
     return result;
   } else {
-    return {};
+    return ORDER_BY;
   }
 }
