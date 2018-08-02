@@ -49,8 +49,10 @@ const schema = {
       "minLength": 5,
       "maxLength": 255
     },
-    "eventDate": {
-      "type": Date
+    "wfEventDate": {
+      "type": Date,
+      "filterable": "false",
+      "sortable": "true"
     },
     "eventStatus": {
       "type": "string"
@@ -65,9 +67,7 @@ const schema = {
       "type": Date
     },
     "updatedDate": {
-      "type": Date,
-      "filterable": "false",
-      "sortable": "true"
+      "type": Date
     },
     "required": ["tenantId", "wfInstanceId", "wfEntity", "wfEntityAction", "query", "eventStatus", "createdBy", "createdDate", "wfInstanceStatus"]
   }

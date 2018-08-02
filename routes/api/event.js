@@ -6,7 +6,7 @@ const attributes = _.keys(schema.properties);
 const shortid = require("shortid");
 
 const ORDER_BY = process.env.ORDER_BY || {
-  updatedDate: -1
+  wfEventDate: -1
 };
 
 const LIMIT = process.env.LIMIT || 20;
