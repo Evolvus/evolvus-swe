@@ -16,6 +16,9 @@ const schema = {
       "filterable": false, //custom attributes
       "sortable": false //custom attribute
     },
+    "object": {
+      "type": "object"
+    },
     "wfInstanceId": {
       "type": "string",
       "minLength": 3,

@@ -17,7 +17,7 @@ const shortid = require("shortid");
 // we execute callback with new wfInstanceId, and status = 'INITIATED'
 // if the flowCode is 'AA' - we call complete with Status = 'APPROVED', wfInstanceId
 // (newly created), and comment - Automatic Approval.
-module.exports.initialize = (tenantId, createdBy, wfEntity, wfEntityAction, objectId) => {
+module.exports.initialize = (tenantId, createdBy, wfEntity, wfEntityAction, objectId, oldObject) => {
   let wfInstanceId = shortid.generate();
   let sweEvent = {
     "wfInstanceId": wfInstanceId,
@@ -28,7 +28,8 @@ module.exports.initialize = (tenantId, createdBy, wfEntity, wfEntityAction, obje
     "wfEventDate": Date.now(),
     "wfEvent": "PENDING_AUTHORIZATION",
     "createdBy": createdBy,
-    "createdDate": Date.now()
+    "createdDate": Date.now(),
+    "object": oldObject
   };
   return eventService.save(tenantId, sweEvent)
     .then((result) => {
@@ -52,7 +53,7 @@ module.exports.initialize = (tenantId, createdBy, wfEntity, wfEntityAction, obje
     });
 };
 
-module.exports.complete = (tenantId, createdBy, wfEntity, objectId, wfInstanceId, wfEvent, comments) => {
+module.exports.complete = (tenantId, createdBy, wfEntity, objectId, wfInstanceId, wfEvent, comments, oldObject) => {
   let sweEvent = {
     "wfInstanceId": wfInstanceId,
     "wfInstanceStatus": "COMPLETED",
@@ -64,14 +65,24 @@ module.exports.complete = (tenantId, createdBy, wfEntity, objectId, wfInstanceId
     "createdBy": createdBy,
     // "updatedBy": createdBy,
     "createdDate": Date.now(),
-    "comments": comments
+    "comments": comments,
+    "object": oldObject
   };
+  var updatedata = oldObject[0];
   debug("saving event %O", sweEvent);
   var query = {
     "wfEntity": wfEntity,
     //"wfEntityAction": wfEntityAction
   };
   setupService.findOne(tenantId, query).then((result) => {
+    let data;
+    if (sweEvent.wfEvent === "AUTHORIZED") {
+      data = {
+        "processingStatus": wfEvent
+      }
+    } else {
+      data = updatedata
+    }
     axios({
       headers: {
         "X-TENANT-ID": tenantId,
@@ -82,12 +93,10 @@ module.exports.complete = (tenantId, createdBy, wfEntity, objectId, wfInstanceId
       },
       method: result.callbackMethod,
       url: result.callbackURL + "/" + objectId,
-      data: {
-        "processingStatus": wfEvent
-      }
-
+      data: data
     }).catch((err) => {
-      debug(`Error:${err} and failed to Axios`)
+      debug(`Error:${err} and failed to Axios`);
+      resolve(err);
     });
   }).catch((err) => {
     debug(`Error:${err} and failed to findOne setup`);

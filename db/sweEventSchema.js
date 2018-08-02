@@ -8,6 +8,9 @@ var schema = new mongoose.Schema({
     minLength: 1,
     maxLength: 64
   },
+  object: {
+    type: Object
+  },
   wfInstanceId: {
     type: String,
     required: true,

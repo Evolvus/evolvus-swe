@@ -3,7 +3,7 @@ const model = require("./sweEventSchema")
   .schema;
 const _ = require("lodash");
 const schema = require("../db/sweEventSchema");
-const Dao = require("../db/dao");
+const Dao = require("@evolvus/evolvus-mongo-dao").Dao;
 
 const collection = new Dao("sweEvent", schema);
 
