@@ -57,7 +57,7 @@ module.exports = (router) => {
       debug("updating object" + JSON.stringify(body, null, 2));
       service.complete(tenantId, createdBy, body.wfEntity, body.query, body.wfInstanceId, body.wfEvent, body.comments)
         .then((result) => {
-          response.description = `${body.wfEntity} ${body.wfEvent} successfully`;
+          response.description = `${body.wfEntity} ${body.wfEvent} successfully by ${createdBy}`;
           response.data = result;
           res.status(200)
             .send(JSON.stringify(response, null, 2));
