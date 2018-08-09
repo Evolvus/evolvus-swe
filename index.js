@@ -42,10 +42,10 @@ module.exports.initialize = (tenantId, createdBy, wfEntity, wfEntityAction, obje
     })
     .then((result) => {
       if (result == null) { // no records found..
-        return module.exports.complete(tenantId, createdBy, wfEntity, wfEntityAction, objectId, wfInstanceId, "REPROCESS", "Invalid WF Configuration")
+        return module.exports.complete(tenantId, createdBy, wfEntity, objectId, wfInstanceId, "REPROCESS", "Invalid WF Configuration", oldObject)
       } else {
         if (result.flowCode == 'AA') { // automatic approval
-          return module.exports.complete(tenantId, createdBy, wfEntity, wfEntityAction, objectId, wfInstanceId, "AUTHORIZED", "Automatic Approval")
+          return module.exports.complete(tenantId, createdBy, wfEntity, objectId, wfInstanceId, "AUTHORIZED", "Automatic Approval", oldObject)
         } else { // maker checker
           return Promise.resolve(sweEvent);
         }
@@ -68,7 +68,7 @@ module.exports.complete = (tenantId, createdBy, wfEntity, objectId, wfInstanceId
     "comments": comments,
     "object": oldObject
   };
-  var updatedata = oldObject[0];
+  var updatedata = oldObject;
   debug("saving event %O", sweEvent);
   var query = {
     "wfEntity": wfEntity,
@@ -81,7 +81,7 @@ module.exports.complete = (tenantId, createdBy, wfEntity, objectId, wfInstanceId
         "processingStatus": wfEvent
       }
     } else {
-      data = updatedata
+      data = oldObject
     }
     axios({
       headers: {
