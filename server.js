@@ -20,13 +20,30 @@ const db = require("./db");
 const _ = require("lodash");
 const shortid = require("shortid");
 
+const healthCheck = require("@evolvus/evolvus-node-health-check");
+const healthCheckAttributes = ["status", "saveTime"];
+let body = _.pick(healthCheckAttributes);
+
 const LIMIT = process.env.LIMIT || 10;
 const tenantHeader = "X-TENANT-ID";
 const userHeader = "X-USER";
 const ipHeader = "X-IP-HEADER";
 const PAGE_SIZE = 10;
 
-var connection = db.connect("swe");
+var connection = db.connect("swe").then((res,err)=>{
+  if(err){
+    debug(`connection problem due to :${err}`);
+  } else{
+    debug("connected to mongodb");
+    body.status = "working";
+    body.saveTime = new Date().toISOString();
+    healthCheck.save(body).then((ent) => {
+      debug("healthcheck object saved")
+    }).catch((e) => {
+      debug(`unable to save Healthcheck object due to ${e}`);
+    });
+  }
+});
 
 const hbsViewEngine = hbs.__express;
 const app = express();
@@ -142,14 +159,21 @@ function onHealthCheck() {
   // checks if the system is healthy, like the db connection is live
   // resolves, if health, rejects if not
   return new Promise((resolve, reject) => {
-    debug("0 = disconnected, 1 = connected, 2 = connecting, 3 = disconnecting, Connection ready state: " + connection.readyState);
-    if (connection.readyState == 1) {
-      resolve("All is good, Connection status is: " + connection.readyState);
-    } else {
-      reject("Not so good, Connection status is: " + connection.readyState);
-    }
+
+    healthCheck.getAll(-1).then((healthChecks) => {
+      if (healthChecks.length > 0) {
+        resolve("CONNECTION CONNECTED");
+        debug("CONNECTION CONNECTED");
+      } else {
+        reject("CONNECTION PROBLEM");
+        debug("CONNECTION PROBLEM");
+      }
+    }).catch((e) => {
+      debug("CONNECTION PROBLEM");
+      reject("CONNECTION PROBLEM");
+    });
   });
-}
+};
 
 const server = http.createServer(app);
 
@@ -161,9 +185,7 @@ terminus(server, {
   onSignal
 });
 
-/*
- ** Finally start the server
- */
+
 server.listen(PORT, () => {
   debug("server started: ", PORT);
   app.emit("application_started");
