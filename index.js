@@ -42,10 +42,10 @@ module.exports.initialize = (tenantId, createdBy, wfEntity, wfEntityAction, obje
     })
     .then((result) => {
       if (result == null) { // no records found..
-        return module.exports.complete(tenantId, createdBy, wfEntity, objectId, wfInstanceId, "REPROCESS", "Invalid WF Configuration", oldObject)
+        return module.exports.complete(tenantId, createdBy, wfEntity, objectId, wfInstanceId, "REPROCESS", "Invalid WF Configuration")
       } else {
         if (result.flowCode == 'AA') { // automatic approval
-          return module.exports.complete(tenantId, createdBy, wfEntity, objectId, wfInstanceId, "AUTHORIZED", "Automatic Approval", oldObject)
+          return module.exports.complete(tenantId, createdBy, wfEntity, objectId, wfInstanceId, "AUTHORIZED", "Automatic Approval")
         } else { // maker checker
           return Promise.resolve(sweEvent);
         }
@@ -53,53 +53,56 @@ module.exports.initialize = (tenantId, createdBy, wfEntity, wfEntityAction, obje
     });
 };
 
-module.exports.complete = (tenantId, createdBy, wfEntity, objectId, wfInstanceId, wfEvent, comments, oldObject) => {
+module.exports.complete = (tenantId, createdBy, wfEntity, objectId, wfInstanceId, wfEvent, comments) => {
   let sweEvent = {
     "wfInstanceId": wfInstanceId,
     "wfInstanceStatus": "COMPLETED",
-    //"wfEntityAction": wfEntityAction,
     "query": objectId,
     "wfEntity": wfEntity,
     "wfEventDate": Date.now(),
     "wfEvent": wfEvent,
     "createdBy": createdBy,
-    // "updatedBy": createdBy,
     "createdDate": Date.now(),
-    "comments": comments,
-    "object": oldObject
+    "comments": comments
   };
-  var updatedata = oldObject;
   debug("saving event %O", sweEvent);
   var query = {
-    "wfEntity": wfEntity,
-    //"wfEntityAction": wfEntityAction
+    "wfEntity": wfEntity
   };
-  setupService.findOne(tenantId, query).then((result) => {
-    let data;
-    if (sweEvent.wfEvent === "AUTHORIZED") {
-      data = {
-        "processingStatus": wfEvent
+  eventService.find(tenantId, {
+    "wfInstanceId": wfInstanceId
+  }, {}, 0, 1).then((result) => {
+    let oldObject = result[0].object;
+    setupService.findOne(tenantId, query).then((result) => {
+      let data;
+      if (sweEvent.wfEvent === "AUTHORIZED") {
+        data = {
+          "processingStatus": wfEvent
+        }
+      } else {
+        data = oldObject
       }
-    } else {
-      data = oldObject
-    }
-    axios({
-      headers: {
-        "X-TENANT-ID": tenantId,
-        "X-USER": createdBy,
-        "X-IP-HEADER": "192.168.1.122",
-        "X-ACCESS-LEVEL": "1",
-        "X-ENTITY-ID": "H001B001"
-      },
-      method: result.callbackMethod,
-      url: result.callbackURL + "/" + objectId,
-      data: data
+      axios({
+        headers: {
+          "X-TENANT-ID": tenantId,
+          "X-USER": createdBy,
+          "X-IP-HEADER": "192.168.1.122",
+          "X-ACCESS-LEVEL": "1",
+          "X-ENTITY-ID": "H001B001"
+        },
+        method: result.callbackMethod,
+        url: result.callbackURL + "/" + objectId,
+        data: data
+      }).catch((err) => {
+        debug(`Error:${err} and failed to Axios`);
+        resolve(err);
+      });
     }).catch((err) => {
-      debug(`Error:${err} and failed to Axios`);
+      debug(`Error:${err} and failed to findOne setup`);
       resolve(err);
     });
   }).catch((err) => {
-    debug(`Error:${err} and failed to findOne setup`);
+    debug(`Error:${err} and failed to find Event`);
     resolve(err);
   });
   return eventService.update(tenantId, {

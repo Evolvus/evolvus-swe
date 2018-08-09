@@ -5,7 +5,7 @@ const service = require("../../index");
 const shortid = require("shortid");
 
 const initializeAttributes = ["wfEntity", "wfEntityAction", "query", "object"];
-const completionAttributes = ["wfEntity", "wfInstanceId", "wfEvent", "query", "comments", "object"];
+const completionAttributes = ["wfEntity", "wfInstanceId", "wfEvent", "query", "comments"];
 
 
 module.exports = (router) => {
@@ -55,7 +55,7 @@ module.exports = (router) => {
       let createdBy = req.body.createdBy;
       let body = _.pick(req.body, completionAttributes);
       debug("updating object" + JSON.stringify(body, null, 2));
-      service.complete(tenantId, createdBy, body.wfEntity, body.query, body.wfInstanceId, body.wfEvent, body.comments, body.object)
+      service.complete(tenantId, createdBy, body.wfEntity, body.query, body.wfInstanceId, body.wfEvent, body.comments)
         .then((result) => {
           response.description = `${body.wfEntity} ${body.wfEvent} successfully by ${createdBy}`;
           response.data = result;
