@@ -24,6 +24,7 @@
   "homepage": "https://github.com/Evolvus/evolvus-swe#readme",
   "dependencies": {
     "@evolvus/evolvus-mongo-dao": "^1.0.1",
+    "@evolvus/evolvus-node-health-check": "^2.0.1",
     "@godaddy/terminus": "^2.4.1",
     "axios": "^0.18.0",
     "body-parser": "^1.18.2",
