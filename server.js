@@ -14,7 +14,6 @@ const terminus = require("@godaddy/terminus");
 const express = require("express");
 const bodyParser = require("body-parser");
 const path = require("path");
-const hbs = require("hbs");
 const helmet = require("helmet");
 const db = require("./db");
 const _ = require("lodash");
@@ -28,32 +27,8 @@ const PAGE_SIZE = 10;
 
 var connection = db.connect("swe");
 
-const hbsViewEngine = hbs.__express;
 const app = express();
 const router = express.Router();
-
-hbs.registerPartials(path.join(__dirname, "views", "partials"), (err) => {
-  if (err) {
-    debug("error registering partials: ", err);
-  } else {
-    debug("registering hbs partials");
-  }
-});
-
-hbs.registerHelper("if_eq", function(a, b, opts) {
-  if (a == b)
-    return opts.fn(this);
-  else
-    return opts.inverse(this);
-});
-
-hbs.registerHelper("ternary", function(index, yes, no) {
-  var res = false;
-  if (index % 2 == 0) {
-    res = true;
-  }
-  return res ? yes : no;
-});
 
 // with this setting we expect the correct client hostname to be in the
 // header X-Forwarded-Host and we get this value from req.hostname and
@@ -122,9 +97,6 @@ app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Credentials", "true");
   next();
 });
-
-app.engine("html", hbsViewEngine);
-
 
 require("./routes/main")(router);
 app.use("/api", router);
