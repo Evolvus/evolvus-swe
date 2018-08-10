@@ -15,7 +15,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const path = require("path");
 const helmet = require("helmet");
-const db = require("./db");
+const db = require("@evolvus/evolvus-mongo-dao").connection;
 const _ = require("lodash");
 const shortid = require("shortid");
 
@@ -29,10 +29,10 @@ const userHeader = "X-USER";
 const ipHeader = "X-IP-HEADER";
 const PAGE_SIZE = 10;
 
-var connection = db.connect("swe").then((res,err)=>{
-  if(err){
+var connection = db.connect("swe").then((res, err) => {
+  if (err) {
     debug(`connection problem due to :${err}`);
-  } else{
+  } else {
     debug("connected to mongodb");
     body.status = "working";
     body.saveTime = new Date().toISOString();
