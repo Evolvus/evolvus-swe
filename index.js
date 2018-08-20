@@ -72,10 +72,15 @@ module.exports.complete = (tenantId, createdBy, wfEntity, objectId, wfInstanceId
   eventService.find(tenantId, {
     "wfInstanceId": wfInstanceId
   }, {}, 0, 1).then((result) => {
+    let action = result[0].wfEntityAction;
     let oldObject = result[0].object;
     setupService.findOne(tenantId, query).then((result) => {
       let data;
-      if (sweEvent.wfEvent === "AUTHORIZED") {
+      if (sweEvent.wfEvent === "AUTHORIZED" && action === "UPDATE") {
+        data = {
+          "processingStatus": wfEvent
+        }
+      } else if (action === "CREATE") {
         data = {
           "processingStatus": wfEvent
         }
