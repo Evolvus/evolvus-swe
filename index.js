@@ -44,8 +44,14 @@ module.exports.initialize = (tenantId, createdBy, wfEntity, wfEntityAction, obje
       if (result == null) { // no records found..
         return module.exports.complete(tenantId, createdBy, wfEntity, objectId, wfInstanceId, "REPROCESS", "Invalid WF Configuration")
       } else {
-        if (result.flowCode == 'AA') { // automatic approval
-          return module.exports.complete(tenantId, createdBy, wfEntity, objectId, wfInstanceId, "AUTHORIZED", "Automatic Approval")
+        if (result.flowCode == 'AA') {
+          // automatic approval
+          return module.exports.complete(tenantId, createdBy, wfEntity, objectId, wfInstanceId, "AUTHORIZED", "Automatic Approval").then((res) => {
+            res.wfInstanceStatus = "AUTHORIZED";
+            return Promise.resolve(res);
+          }).catch((e) => {
+            return Promise.reject(e);
+          });
         } else { // maker checker
           return Promise.resolve(sweEvent);
         }
@@ -76,9 +82,9 @@ module.exports.complete = (tenantId, createdBy, wfEntity, objectId, wfInstanceId
     let oldObject = result[0].object;
     setupService.findOne(tenantId, query).then((result) => {
       let data;
-      let status="INACTIVE";
-      if(sweEvent.wfEvent === "AUTHORIZED") {
-        status="ACTIVE";
+      let status = "INACTIVE";
+      if (sweEvent.wfEvent === "AUTHORIZED" && result.flowCode !== "AA") {
+        status = "ACTIVE";
       }
       if (sweEvent.wfEvent === "AUTHORIZED" && action === "UPDATE") {
         data = {
@@ -87,7 +93,7 @@ module.exports.complete = (tenantId, createdBy, wfEntity, objectId, wfInstanceId
       } else if (action === "CREATE") {
         data = {
           "processingStatus": wfEvent,
-          "activationStatus":status
+          "activationStatus": status
         }
       } else {
         data = oldObject
