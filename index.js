@@ -42,7 +42,7 @@ module.exports.initialize = (tenantId, createdBy, wfEntity, wfEntityAction, obje
     })
     .then((result) => {
       if (result == null) { // no records found..
-        return module.exports.complete(tenantId, createdBy, wfEntity, objectId, wfInstanceId, "REPROCESS", "Invalid WF Configuration")
+        return module.exports.complete(tenantId, createdBy, wfEntity, objectId, wfInstanceId, "REPROCESS", "Invalid WF Configuration");
       } else {
         if (result.flowCode == 'AA') {
           // automatic approval
@@ -89,14 +89,14 @@ module.exports.complete = (tenantId, createdBy, wfEntity, objectId, wfInstanceId
       if (sweEvent.wfEvent === "AUTHORIZED" && action === "UPDATE") {
         data = {
           "processingStatus": wfEvent
-        }
+        };
       } else if (action === "CREATE") {
         data = {
           "processingStatus": wfEvent,
           "activationStatus": status
-        }
+        };
       } else {
-        data = oldObject
+        data = oldObject;
       }
       axios({
         headers: {
