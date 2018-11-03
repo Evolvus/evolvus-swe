@@ -86,7 +86,7 @@ module.exports.complete = (tenantId, createdBy, wfEntity, objectId, wfInstanceId
       if (sweEvent.wfEvent === "AUTHORIZED" && result.flowCode !== "AA") {
         status = "ACTIVE";
       }
-      if (sweEvent.wfEvent === "AUTHORIZED" && action === "UPDATE") {
+      if ((sweEvent.wfEvent === "AUTHORIZED" || sweEvent.wfEvent === "FAILURE") && action === "UPDATE") {
         data = {
           "processingStatus": wfEvent
         };
@@ -122,8 +122,8 @@ module.exports.complete = (tenantId, createdBy, wfEntity, objectId, wfInstanceId
     resolve(err);
   });
   return eventService.update(tenantId, {
-      "wfInstanceId": wfInstanceId
-    }, {
+    "wfInstanceId": wfInstanceId
+  }, {
       "wfInstanceStatus": "COMPLETED",
       "updatedBy": createdBy,
       "updatedDate": Date.now()
