@@ -52,6 +52,8 @@ module.exports = (router) => {
       };
 
       let tenantId = req.body.tenantId;
+      console.log("tenantid",tenantId);
+      
       let createdBy = req.body.createdBy;
       let body = _.pick(req.body, completionAttributes);
       debug("updating object" + JSON.stringify(body, null, 2));
@@ -74,6 +76,41 @@ module.exports = (router) => {
             .send(JSON.stringify(response, null, 2));
         });
     });
+
+    router.route('/swe/chargesComplete')
+    .post((req, res, next) => {
+      const response = {
+        "status": "200",
+        "description": "",
+        "data": {}
+      };
+
+      let tenantId = req.body.utilityCode;
+      
+      let createdBy = req.body.createdBy;
+      let body = _.pick(req.body, completionAttributes);
+      debug("updating object" + JSON.stringify(body, null, 2));
+      service.complete(tenantId, createdBy, body.wfEntity, body.query, body.wfInstanceId, body.wfEvent, body.comments)
+        .then((result) => {
+          response.description = `${body.wfEntity} ${body.wfEvent} successfully by ${createdBy}`;
+          response.data = result;
+          res.status(200)
+            .send(JSON.stringify(response, null, 2));
+        })
+        .catch((e) => {
+          // With the reference we should be able to search the logs and find out
+          // what exactly was the error.
+          let reference = shortid.generate();
+          response.status = "400";
+          response.data = reference;
+          response.description = "Unable to save workflow engine (complete) configuration. Contact administrator";
+          debug("Reference %s, Unexpected exception in save %o", reference, JSON.stringify(e));
+          res.status(400)
+            .send(JSON.stringify(response, null, 2));
+        });
+    });
+
+
 
 
   router.route('/setup')
