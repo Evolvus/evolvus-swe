@@ -22,9 +22,9 @@ module.exports.save = (tenantId, object) => {
 
 // Ensure skipCount is >= 0
 module.exports.find = (tenantId, filter, orderby, skipCount, limit) => {
-  // let query = _.merge(filter, {
-  //   "tenantId": tenantId
-  // });
+  let query = _.merge(filter, {
+    "tenantId": tenantId
+  });
   return collection.find(filter, orderby, skipCount, limit);
 };
 
@@ -32,8 +32,8 @@ module.exports.find = (tenantId, filter, orderby, skipCount, limit) => {
 module.exports.findOne = (tenantId, filter) => {
   console.log("INSIDE",tenantId,filter);
   
-  // let query = _.merge(filter, {
-  //   "tenantId": tenantId
-  // });
+  let query = _.merge(filter, {
+    "tenantId": tenantId
+  });
   return collection.findOne(filter);
 };
