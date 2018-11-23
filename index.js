@@ -80,11 +80,15 @@ module.exports.complete = (tenantId, createdBy, wfEntity, objectId, wfInstanceId
   }, {}, 0, 1).then((result) => {
     let action = result[0].wfEntityAction;
     let oldObject = result[0].object;
+    let value = result[0].object.activationStatus;
     setupService.findOne(tenantId, query).then((result) => {
       let data;
       let status = "INACTIVE";
       if (sweEvent.wfEvent === "AUTHORIZED" && result.flowCode !== "AA") {
         status = "ACTIVE";
+      }
+      if (sweEvent.wfEvent === "AUTHORIZED" && result.flowCode === "AA") {
+        status = value;
       }
       if ((sweEvent.wfEvent === "AUTHORIZED" || sweEvent.wfEvent === "FAILURE") && action === "UPDATE") {
         data = {
@@ -111,15 +115,15 @@ module.exports.complete = (tenantId, createdBy, wfEntity, objectId, wfInstanceId
         data: data
       }).catch((err) => {
         debug(`Error:${err} and failed to Axios`);
-        resolve(err);
+        Promise.resolve(err);
       });
     }).catch((err) => {
       debug(`Error:${err} and failed to findOne setup`);
-      resolve(err);
+      Promise.resolve(err);
     });
   }).catch((err) => {
     debug(`Error:${err} and failed to find Event`);
-    resolve(err);
+    Promise.resolve(err);
   });
   return eventService.update(tenantId, {
     "wfInstanceId": wfInstanceId
