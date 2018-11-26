@@ -80,7 +80,10 @@ module.exports.complete = (tenantId, createdBy, wfEntity, objectId, wfInstanceId
   }, {}, 0, 1).then((result) => {
     let action = result[0].wfEntityAction;
     let oldObject = result[0].object;
-    let value = result[0].object.activationStatus;
+    let value;
+    if (result[0].object) {
+      value = result[0].object.activationStatus;
+    }
     setupService.findOne(tenantId, query).then((result) => {
       let data;
       let status = "INACTIVE";
