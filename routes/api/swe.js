@@ -4,7 +4,7 @@ const _ = require("lodash");
 const service = require("../../index");
 const shortid = require("shortid");
 
-const initializeAttributes = ["wfEntity", "wfEntityAction", "query", "object"];
+const initializeAttributes = ["wfEntity", "wfEntityAction", "query", "object", "flowCode"];
 const completionAttributes = ["wfEntity", "wfInstanceId", "wfEvent", "query", "comments"];
 
 
@@ -23,7 +23,7 @@ module.exports = (router) => {
       let createdBy = req.body.createdBy;
       let body = _.pick(req.body, initializeAttributes);
       debug("saving object" + JSON.stringify(body, null, 2));
-      service.initialize(tenantId, createdBy, body.wfEntity, body.wfEntityAction, body.query, body.object)
+      service.initialize(tenantId, createdBy, body.wfEntity, body.wfEntityAction, body.query, body.object, body.flowCode)
         .then((result) => {
           response.description = "Record saved successfully";
           response.data = result;
@@ -50,8 +50,7 @@ module.exports = (router) => {
         "description": "",
         "data": {}
       };
-
-      let tenantId = req.body.tenantId;      
+      let tenantId = req.body.tenantId;
       let createdBy = req.body.createdBy;
       let body = _.pick(req.body, completionAttributes);
       debug("updating object" + JSON.stringify(body, null, 2));
@@ -75,7 +74,7 @@ module.exports = (router) => {
         });
     });
 
-    router.route('/swe/chargesComplete')
+  router.route('/swe/chargesComplete')
     .post((req, res, next) => {
       const response = {
         "status": "200",
@@ -86,7 +85,7 @@ module.exports = (router) => {
       let tenantId = req.body.corporateId;
       let createdBy = req.body.createdBy;
       let body = _.pick(req.body, completionAttributes);
-      debug("updating object" + JSON.stringify(body, null, 2));      
+      debug("updating object" + JSON.stringify(body, null, 2));
       service.complete(tenantId, createdBy, body.wfEntity, body.query, body.wfInstanceId, body.wfEvent, body.comments)
         .then((result) => {
           response.description = `${body.wfEntity} ${body.wfEvent} successfully by ${createdBy}`;

@@ -17,7 +17,7 @@ const shortid = require("shortid");
 // we execute callback with new wfInstanceId, and status = 'INITIATED'
 // if the flowCode is 'AA' - we call complete with Status = 'APPROVED', wfInstanceId
 // (newly created), and comment - Automatic Approval.
-module.exports.initialize = (tenantId, createdBy, wfEntity, wfEntityAction, objectId, oldObject) => {
+module.exports.initialize = (tenantId, createdBy, wfEntity, wfEntityAction, objectId, oldObject, flowCode) => {
   let wfInstanceId = shortid.generate();
   let sweEvent = {
     "wfInstanceId": wfInstanceId,
@@ -38,9 +38,12 @@ module.exports.initialize = (tenantId, createdBy, wfEntity, wfEntityAction, obje
         "wfEntity": wfEntity,
         "wfEntityAction": wfEntityAction
       };
+      if (flowCode) {
+        query.flowCode = flowCode;
+      }
       return setupService.findOne(tenantId, query);
     })
-    .then((result) => {
+    .then((result) => {      
       if (result == null) { // no records found..
         return module.exports.complete(tenantId, createdBy, wfEntity, objectId, wfInstanceId, "REPROCESS", "Invalid WF Configuration");
       } else {
@@ -83,15 +86,15 @@ module.exports.complete = (tenantId, createdBy, wfEntity, objectId, wfInstanceId
     let value;
     if (result[0].object) {
       value = result[0].object.activationStatus;
-    }
-    setupService.findOne(tenantId, query).then((result) => {
+    }    
+    setupService.findOne(tenantId, query).then((result) => {      
       let data;
       let status = "INACTIVE";
-      if (sweEvent.wfEvent === "AUTHORIZED" && result.flowCode !== "AA") {
+      if (sweEvent.wfEvent === "AUTHORIZED" && result.flowCode !== "AA") {        
         status = "ACTIVE";
       }
       if (sweEvent.wfEvent === "AUTHORIZED" && result.flowCode === "AA") {
-        status = value;
+        status = value;        
       }
       if ((sweEvent.wfEvent === "AUTHORIZED" || sweEvent.wfEvent === "FAILURE") && action === "UPDATE") {
         data = {
@@ -104,7 +107,7 @@ module.exports.complete = (tenantId, createdBy, wfEntity, objectId, wfInstanceId
         };
       } else {
         data = oldObject;
-      }
+      }      
       axios({
         headers: {
           "X-TENANT-ID": tenantId,
