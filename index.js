@@ -43,13 +43,13 @@ module.exports.initialize = (tenantId, createdBy, wfEntity, wfEntityAction, obje
       }
       return setupService.findOne(tenantId, query);
     })
-    .then((result) => {      
+    .then((result) => {
       if (result == null) { // no records found..
         return module.exports.complete(tenantId, createdBy, wfEntity, objectId, wfInstanceId, "REPROCESS", "Invalid WF Configuration");
       } else {
         if (result.flowCode == 'AA') {
           // automatic approval
-          return module.exports.complete(tenantId, createdBy, wfEntity, objectId, wfInstanceId, "AUTHORIZED", "Automatic Approval").then((res) => {
+          return module.exports.complete(tenantId, createdBy, wfEntity, objectId, wfInstanceId, "AUTHORIZED", "Automatic Approval","AA").then((res) => {
             res.wfInstanceStatus = "AUTHORIZED";
             return Promise.resolve(res);
           }).catch((e) => {
@@ -62,7 +62,7 @@ module.exports.initialize = (tenantId, createdBy, wfEntity, wfEntityAction, obje
     });
 };
 
-module.exports.complete = (tenantId, createdBy, wfEntity, objectId, wfInstanceId, wfEvent, comments) => {
+module.exports.complete = (tenantId, createdBy, wfEntity, objectId, wfInstanceId, wfEvent, comments, flowCode) => {
   let sweEvent = {
     "wfInstanceId": wfInstanceId,
     "wfInstanceStatus": "COMPLETED",
@@ -86,15 +86,18 @@ module.exports.complete = (tenantId, createdBy, wfEntity, objectId, wfInstanceId
     let value;
     if (result[0].object) {
       value = result[0].object.activationStatus;
-    }    
-    setupService.findOne(tenantId, query).then((result) => {      
+    }
+    if (flowCode) {
+      query.flowCode = flowCode;
+    }
+    setupService.findOne(tenantId, query).then((result) => {
       let data;
       let status = "INACTIVE";
-      if (sweEvent.wfEvent === "AUTHORIZED" && result.flowCode !== "AA") {        
+      if (sweEvent.wfEvent === "AUTHORIZED" && result.flowCode !== "AA") {
         status = "ACTIVE";
       }
       if (sweEvent.wfEvent === "AUTHORIZED" && result.flowCode === "AA") {
-        status = value;        
+        status = value;
       }
       if ((sweEvent.wfEvent === "AUTHORIZED" || sweEvent.wfEvent === "FAILURE") && action === "UPDATE") {
         data = {
@@ -107,7 +110,7 @@ module.exports.complete = (tenantId, createdBy, wfEntity, objectId, wfInstanceId
         };
       } else {
         data = oldObject;
-      }      
+      }
       axios({
         headers: {
           "X-TENANT-ID": tenantId,
