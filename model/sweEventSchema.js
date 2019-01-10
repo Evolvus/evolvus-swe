@@ -49,7 +49,6 @@ const schema = {
     },
     "comments": {
       "type": "string",
-      "minLength": 5,
       "maxLength": 255
     },
     "wfEventDate": {
