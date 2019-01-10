@@ -49,7 +49,6 @@ var schema = new mongoose.Schema({
   },
   comments: {
     type: String,
-    minLength: 5,
     maxLength: 255
   },
   createdBy: {
