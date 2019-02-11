@@ -34,7 +34,8 @@ const schema = {
     "wfEntity": {
       "type": "string",
       "minlength": 3,
-      "maxlength": 20
+      "maxlength": 20,
+      "filterable": true
     },
     "wfEntityAction": {
       "type": "string",
