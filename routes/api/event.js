@@ -71,7 +71,7 @@ module.exports = (router) => {
 
       var sort = _.get(req.query, "sort", {});
       var orderby = sortable(sort);
-
+      limit = +limit;
       event.find(tenantId, filter, orderby, skipCount, limit)
         .then((result) => {
           response.description = (result.length == 0 ? "No matching records found" : "Found matching records");
