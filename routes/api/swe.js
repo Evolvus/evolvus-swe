@@ -7,6 +7,10 @@ const shortid = require("shortid");
 const initializeAttributes = ["wfEntity", "wfEntityAction", "query", "object", "flowCode"];
 const completionAttributes = ["wfEntity", "wfInstanceId", "wfEvent", "query", "comments"];
 
+ 
+
+var url  = require('url');
+
 
 module.exports = (router) => {
   // post with the following in the body
@@ -18,12 +22,17 @@ module.exports = (router) => {
         "description": "",
         "data": {}
       };
+      
+      var url_parts = url.parse(req.url);
+ console.log("url parts",url_parts);
+ console.log("url path",url_parts.pathname);
 
+      let path = url_parts.pathname;
       let tenantId = req.body.tenantId;
       let createdBy = req.body.createdBy;
       let body = _.pick(req.body, initializeAttributes);
       debug("saving object" + JSON.stringify(body, null, 2));
-      service.initialize(tenantId, createdBy, body.wfEntity, body.wfEntityAction, body.query, body.object, body.flowCode)
+      service.initialize(path,tenantId, createdBy, body.wfEntity, body.wfEntityAction, body.query, body.object, body.flowCode)
         .then((result) => {
           response.description = "Record saved successfully";
           response.data = result;

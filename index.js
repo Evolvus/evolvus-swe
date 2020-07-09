@@ -17,7 +17,7 @@ const shortid = require("shortid");
 // we execute callback with new wfInstanceId, and status = 'INITIATED'
 // if the flowCode is 'AA' - we call complete with Status = 'APPROVED', wfInstanceId
 // (newly created), and comment - Automatic Approval.
-module.exports.initialize = (tenantId, createdBy, wfEntity, wfEntityAction, objectId, oldObject, flowCode) => {
+module.exports.initialize = (path,tenantId, createdBy, wfEntity, wfEntityAction, objectId, oldObject, flowCode) => {
   let wfInstanceId = shortid.generate();
   let sweEvent = {
     "wfInstanceId": wfInstanceId,
@@ -41,7 +41,7 @@ module.exports.initialize = (tenantId, createdBy, wfEntity, wfEntityAction, obje
       if (flowCode) {
         query.flowCode = flowCode;
       }
-      return setupService.findOne(tenantId, query);
+      return setupService.findOne(path,tenantId, query);
     })
     .then((result) => {
       if (result == null) { // no records found..

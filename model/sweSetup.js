@@ -29,11 +29,14 @@ module.exports.find = (tenantId, filter, orderby, skipCount, limit) => {
 };
 
 
-module.exports.findOne = (tenantId, filter) => {
+module.exports.findOne = (path,tenantId, filter) => {
   console.log("INSIDE",tenantId,filter);
-  
+
+ 
+  if(path !== '/swe/initialize'){
   let query = _.merge(filter, {
     "tenantId": tenantId
-  });
+  });}
+  
   return collection.findOne(filter);
 };
