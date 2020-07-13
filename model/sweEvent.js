@@ -14,6 +14,7 @@ module.exports.save = (tenantId, object) => {
   let result = _.merge(object, {
     "tenantId": tenantId
   });
+  console.log("result is =",result);
   return collection.save(result)
 };
 

@@ -29,7 +29,18 @@ module.exports.find = (tenantId, filter, orderby, skipCount, limit) => {
 };
 
 
-module.exports.findOne = (path,tenantId, filter) => {
+module.exports.findOne = (tenantId, filter) => {
+  console.log("INSIDE",tenantId,filter);
+
+ 
+  let query = _.merge(filter, {
+    "tenantId": tenantId
+  });
+  console.log("filter one",filter);
+  return collection.findOne(filter);
+};
+
+module.exports.findData = (path,tenantId, filter) => {
   console.log("INSIDE",tenantId,filter);
 
  
@@ -37,6 +48,6 @@ module.exports.findOne = (path,tenantId, filter) => {
   let query = _.merge(filter, {
     "tenantId": tenantId
   });}
-  
+  console.log("filter two",filter);
   return collection.findOne(filter);
 };

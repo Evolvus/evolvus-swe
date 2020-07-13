@@ -41,7 +41,7 @@ module.exports.initialize = (path,tenantId, createdBy, wfEntity, wfEntityAction,
       if (flowCode) {
         query.flowCode = flowCode;
       }
-      return setupService.findOne(path,tenantId, query);
+      return setupService.findData(path,tenantId, query);
     })
     .then((result) => {
       if (result == null) { // no records found..
@@ -87,19 +87,25 @@ module.exports.complete = (tenantId, createdBy, wfEntity, objectId, wfInstanceId
     if (result[0].object) {
       value = result[0].object.activationStatus;
     }
+    console.log("flowcode is ",flowCode);
     if (flowCode) {
       query.flowCode = flowCode;
+      console.log("entering flowcode ",flowCode);
     }
     setupService.findOne(tenantId, query).then((result) => {
       let data;
       let status = "INACTIVE";
+
+      debug("swedata", sweEvent.wfEvent);
+      debug("swedata1", result.flowCode);
+      debug("swedata2", result);
       if (sweEvent.wfEvent === "AUTHORIZED" && result.flowCode !== "AA") {
         status = "ACTIVE";
       }
       if (sweEvent.wfEvent === "AUTHORIZED" && result.flowCode === "AA") {
         status = value;
       }
-      if ((sweEvent.wfEvent === "AUTHORIZED" || sweEvent.wfEvent === "FAILURE") && action === "UPDATE") {
+      if ((sweEvent.wfEvent === "AUTHORIZED" || sweEvent.wfEvent === "REJECTED") && action === "UPDATE") {
         data = {
           "processingStatus": wfEvent
         };
