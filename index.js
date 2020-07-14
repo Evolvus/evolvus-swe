@@ -109,7 +109,7 @@ module.exports.complete = (tenantId, createdBy, wfEntity, objectId, wfInstanceId
         data = {
           "processingStatus": wfEvent
         };
-      } else if (action === "CREATE" || action === "UPDATE") {
+      } else if (action === "CREATE") {
         data = {
           "processingStatus": wfEvent,
           "activationStatus": status
