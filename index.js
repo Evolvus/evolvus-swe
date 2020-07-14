@@ -105,11 +105,11 @@ module.exports.complete = (tenantId, createdBy, wfEntity, objectId, wfInstanceId
       if (sweEvent.wfEvent === "AUTHORIZED" && result.flowCode === "AA") {
         status = value;
       }
-      if ((sweEvent.wfEvent === "AUTHORIZED" || sweEvent.wfEvent === "REJECTED") && action === "UPDATE") {
+      if ((sweEvent.wfEvent === "AUTHORIZED" || sweEvent.wfEvent === "FAILURE") && action === "UPDATE") {
         data = {
           "processingStatus": wfEvent
         };
-      } else if (action === "CREATE") {
+      } else if (action === "CREATE" || action === "UPDATE") {
         data = {
           "processingStatus": wfEvent,
           "activationStatus": status
