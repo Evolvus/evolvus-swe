@@ -40,6 +40,11 @@ module.exports.findOne = (tenantId, filter) => {
   return collection.findOne(filter);
 };
 
+module.exports.findData2 = (filter) =>{
+  console.log("filter two",filter);
+  return collection.findOne(filter);
+}
+
 module.exports.findData = (path,tenantId, filter) => {
   console.log("INSIDE",tenantId,filter);
 
@@ -48,6 +53,6 @@ module.exports.findData = (path,tenantId, filter) => {
   let query = _.merge(filter, {
     "tenantId": tenantId
   });}
-  console.log("filter two",filter);
+  console.log("filter three",filter);
   return collection.findOne(filter);
 };

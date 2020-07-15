@@ -92,13 +92,10 @@ module.exports.complete = (tenantId, createdBy, wfEntity, objectId, wfInstanceId
       query.flowCode = flowCode;
       console.log("entering flowcode ",flowCode);
     }
-    setupService.findOne(tenantId, query).then((result) => {
+    setupService.findData2(tenantId, query).then((result) => {
       let data;
       let status = "INACTIVE";
 
-      debug("swedata", sweEvent.wfEvent);
-      debug("swedata1", result.flowCode);
-      debug("swedata2", result);
       if (sweEvent.wfEvent === "AUTHORIZED" && result.flowCode !== "AA") {
         status = "ACTIVE";
       }
