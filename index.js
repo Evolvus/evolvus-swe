@@ -92,7 +92,7 @@ module.exports.complete = (tenantId, createdBy, wfEntity, objectId, wfInstanceId
       query.flowCode = flowCode;
       console.log("entering flowcode ",flowCode);
     }
-    setupService.findData2(tenantId, query).then((result) => {
+    setupService.findData2(query).then((result) => {
       let data;
       let status = "INACTIVE";
 
